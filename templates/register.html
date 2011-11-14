@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block main %}
+{% from "_formhelpers.html" import render_field %}
+<form method="post" action="/register/">
+    {{ render_field(form.name) }}
+    {{ render_field(form.username) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.confirm) }}
+    {{ render_field(form.accept_tos) }}
+    <input type="submit" value="Create" />
+</form>
+{% endblock %}

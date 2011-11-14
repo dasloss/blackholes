@@ -9,5 +9,7 @@ app = Flask(__name__, static_folder='../static', template_folder='../template')
 app.config.from_object(settings)
 app.register_blueprint(views)
 
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

@@ -32,13 +32,28 @@
             <a href="/" class="brand">Title</a>
             <ul class="secondary-nav">
                 <li><a href="/about/">About</a></li>
-                <li><a href="/awesome/">Awesome</a></li>
+                {% if 'username' in session %}
+                <li><a>Logged in as {{ session.username }}.</a></li>
+                <li><a href="/logout/">Logout</a></li>
+                {% else %}
+                <li><a href="/login/">Login</a></li>
+                <li><a href="/register/">Sign up</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </div>
 </header>
 <div id="main" role="main" class="container">
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+    {% for message in messages %}
+        <li class="alert-message warning">{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+{% endwith %}
 {% block main %}
 {% endblock %}
 </div>

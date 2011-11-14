@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block main %}
+{% from "_formhelpers.html" import render_field %}
+<form method="post" action="/login/">
+    {{ render_field(form.username) }}
+    {{ render_field(form.password) }}
+    <input type="submit" value="Login" />
+</form>
+{% endblock %}
