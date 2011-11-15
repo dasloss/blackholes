@@ -2,9 +2,17 @@
 
 {% block title %}Login{% endblock %}
 
+{% block js %}
+<script type="text/javascript">
+$(function(){
+    $('#login input').first().focus();
+});
+</script>
+{% endblock %}
+
 {% block main %}
 {% from "_formhelpers.html" import render_field %}
-<form method="post" action="/login/">
+<form id="login" method="post" action="/login/">
     {{ render_field(form.username) }}
     {{ render_field(form.password) }}
     {{ render_field(form.remember) }}

@@ -2,9 +2,17 @@
 
 {% block title %}Register{% endblock %}
 
+{% block js %}
+<script type="text/javascript">
+$(function(){
+    $('#register input').first().focus();
+});
+</script>
+{% endblock %}
+
 {% block main %}
 {% from "_formhelpers.html" import render_field %}
-<form method="post" action="/register/">
+<form id="register" method="post" action="/register/">
     {{ render_field(form.name) }}
     {{ render_field(form.username) }}
     {{ render_field(form.email) }}

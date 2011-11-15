@@ -1,6 +1,6 @@
 {% macro render_field(field) %}
 <div class="clearfix">
-<label for="">{{ field.label }}</label>
+{{ field.label }}
 <div class="input">
     {{ field(**kwargs)|safe }}
     {% if field.errors %}
