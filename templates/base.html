@@ -25,6 +25,7 @@
     </script>
     {% endblock %}
 </head>
+<body>
 <header>
 <div class="topbar">
     <div class="fill">
@@ -32,8 +33,8 @@
             <a href="/" class="brand">Title</a>
             <ul class="secondary-nav">
                 <li><a href="/about/">About</a></li>
-                {% if 'username' in session %}
-                <li><a>Logged in as {{ session.username }}.</a></li>
+                {% if current_user.is_authenticated() %}
+                <li><a>Logged in as {{ current_user.username }}.</a></li>
                 <li><a href="/logout/">Logout</a></li>
                 {% else %}
                 <li><a href="/login/">Login</a></li>

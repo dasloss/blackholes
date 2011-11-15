@@ -4,6 +4,7 @@ from app.models import User
 class LoginForm(Form):
     username = TextField('Username', [validators.Required()])
     password = PasswordField('Password', [validators.Required()])
+    remember = BooleanField('Remember me', [validators.Optional()])
 
 class RegistrationForm(Form):
     name = TextField('Real name', [validators.Length(min=1)])

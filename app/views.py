@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flaskext.login import login_user, login_required, current_user, logout_user
 from app.models import *
 from app.forms import *
 
@@ -27,17 +28,30 @@ def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User.objects.filter(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash(u"Username and password do not match")
-            return redirect(url_for('views.login'))
-        flash(u"Successfully logged in as %s" % user.username)
-        session['username'] = user.username
-        return redirect(url_for('views.index'))
+        if user:
+            good_password= user.check_password(form.password.data)
+            if good_password:
+                user.authenticated = True
+                user.save()
+                remember = request.form.get("remember", "n") == "y"
+                if login_user(user, remember=remember):
+                    return redirect(request.args.get("next") or url_for('views.index'))
+                else:
+                    flash("Your account is marked as inactive.")
+                    return redirect(url_for('views.login'))
+            else:
+                flash("There was an error logging in.")
+        else:
+            flash("There was an error logging in.")
+        redirect(url_for('views.login'))
     return render_template('login.html', form=form, session=session)
 
 @views.route('/logout/', methods=['GET', 'POST'])
+@login_required
 def logout():
-    session.pop('username', None)
+    current_user.authenticated = False
+    current_user.save()
+    logout_user()
     return redirect(url_for('views.index'))
 
 @views.app_errorhandler(404)

@@ -7,6 +7,7 @@
 <form method="post" action="/login/">
     {{ render_field(form.username) }}
     {{ render_field(form.password) }}
+    {{ render_field(form.remember) }}
     <input type="submit" value="Login" />
 </form>
 {% endblock %}
