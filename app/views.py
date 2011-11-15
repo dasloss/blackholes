@@ -19,8 +19,10 @@ def register():
                     name=form.name.data,
                     email=form.email.data)
         user.set_password(form.password.data)
+        user.authenticated = True
         user.save()
-        return redirect('/')
+        login_user(user)
+        return redirect(request.args.get("next") or url_for('views.index'))
     return render_template('register.html', form=form, session=session)
 
 @views.route('/login/', methods=['GET', 'POST'])
