@@ -16,3 +16,4 @@ class RegistrationForm(Form):
         ])
     confirm = PasswordField('Repeat password')
     accept_tos = BooleanField('I accept the ToS', [validators.Required()])
+    recaptcha = RecaptchaField()
