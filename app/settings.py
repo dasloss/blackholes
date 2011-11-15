@@ -3,17 +3,11 @@ Global settings for your application.
 """
 
 # Database settings
-DB = ''
-DB_HOST = ''
-DB_PORT = 0
-DB_USER = ''
-DB_PASS = ''
+DB = 'flock'
+DB_HOST = 'dbh73.mongolab.com'
+DB_PORT = 27737
+DB_USER = 'flock'
+DB_PASS = 'flockpass'
 
 # App settings
-SECRET_KEY = ''
-
-# RECAPTCHA settings
-RECAPTCHA_USE_SSL = ''
-RECAPTCHA_PUBLIC_KEY = ''
-RECAPTCHA_PRIVATE_KEY = ''
-RECAPTCHA_OPTIONS = ''
+SECRET_KEY = 'not really a secret'

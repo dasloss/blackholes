@@ -5,12 +5,12 @@ from mongoengine import connect
 from views import views
 from models import *
 
-connect(settings.db, host=settings.db_host, port=settings.db_port, username=settings.db_user, password=settings.db_pass)
+connect(settings.DB, host=settings.DB_HOST, port=settings.DB_PORT, username=settings.DB_USER, password=settings.DB_PASS)
 
 app = Flask(__name__, static_folder='../static', template_folder='../template')
 app.config.from_object(settings)
 app.register_blueprint(views)
-app.secret_key = settings.secret_key
+app.secret_key = settings.SECRET_KEY
 
 login_manager = LoginManager()
 login_manager.setup_app(app)
