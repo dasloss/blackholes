@@ -27,12 +27,13 @@ $(function(){
             {{ render_field(form.username) }}
             {{ render_field(form.password) }}
             {{ render_field(form.remember) }}
-            <div class="actions"><input type="submit" value="Login" class="btn primary" /></div>
+            <div class="actions"><input type="submit" value="Log in" class="btn primary" /></div>
         </form>
     </div>
     <div class="span7">
-        <a href="/auth/twitter/?next=/"><img src="/static/sign-in-with-twitter-l.png" alt="Sign in with Twitter" title="Sign in with Twitter" /></a><br />
-        <a href="/auth/facebook/?next=/"><img src="/static/facebook-connect.png" alt="Sign in with Facebook" title="Sign in with Facebook" /></a>
+        <p><a href="/auth/twitter/?next=/"><img src="/static/sign-in-with-twitter-l.png" alt="Sign in with Twitter" title="Sign in with Twitter" /></a></p>
+        <p><a href="/auth/facebook/?next=/"><img src="/static/facebook-connect.png" alt="Sign in with Facebook" title="Sign in with Facebook" /></a></p>
+        <p>These are persistent logins. Remember to log out!</p>
     </div>
 </div>
 {% endblock %}
