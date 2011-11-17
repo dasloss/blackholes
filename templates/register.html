@@ -2,6 +2,15 @@
 
 {% block title %}Register{% endblock %}
 
+{% block css %}
+<style type="text/css">
+    .span8 {
+        border-right: 1px solid #eee;
+        padding-right: 10px;
+    }
+</style>
+{% endblock %}
+
 {% block js %}
 <script type="text/javascript">
 $(function(){
@@ -12,13 +21,20 @@ $(function(){
 
 {% block main %}
 {% from "_formhelpers.html" import render_field %}
-<form id="register" method="post" action="/register/">
-    {{ render_field(form.name) }}
-    {{ render_field(form.username) }}
-    {{ render_field(form.email) }}
-    {{ render_field(form.password) }}
-    {{ render_field(form.confirm) }}
-    {{ render_field(form.accept_tos) }}
-    <div class="actions"><input type="submit" value="Create" class="btn primary" /></div>
-</form>
+<div class="row">
+    <div class="span8">
+        <form id="register" method="post" action="/register/">
+            {{ render_field(form.username) }}
+            {{ render_field(form.email) }}
+            {{ render_field(form.password) }}
+            {{ render_field(form.confirm) }}
+            <div class="actions"><input type="submit" value="Create" class="btn primary" /></div>
+        </form>
+    </div>
+    <div class="span7">
+        <p><a href="/auth/twitter/?next=/"><img src="/static/sign-in-with-twitter-l.png" alt="Sign in with Twitter" title="Sign in with Twitter" /></a></p>
+        <p><a href="/auth/facebook/?next=/"><img src="/static/facebook-connect.png" alt="Sign in with Facebook" title="Sign in with Facebook" /></a></p>
+        <p>These are persistent logins. Remember to log out!</p>
+    </div>
+</div>
 {% endblock %}

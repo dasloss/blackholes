@@ -7,7 +7,6 @@ class LoginForm(Form):
     remember = BooleanField('Remember me', [validators.Optional()])
 
 class RegistrationForm(Form):
-    name = TextField('Real name', [validators.Required(), validators.Length(min=1)])
     username = TextField('Username', [validators.Required(), validators.Length(min=3, max=20)])
     email = TextField('Email', [validators.Required(), validators.Email()])
     password = PasswordField('New password', [
@@ -15,4 +14,4 @@ class RegistrationForm(Form):
         validators.EqualTo('confirm', message='Passwords must match')
         ])
     confirm = PasswordField('Repeat password', [validators.Required()])
-    accept_tos = BooleanField('I accept the ToS', [validators.Required()])
+    #accept_tos = BooleanField('I accept the ToS', [validators.Required()])

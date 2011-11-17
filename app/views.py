@@ -34,12 +34,12 @@ def get_twitter_token():
 
 @views.route('/auth/twitter/')
 def auth_twitter():
-    return twitter.authorize(callback=url_for('views.oauth_authorized',
+    return twitter.authorize(callback=url_for('views.twitter_oauth_authorized',
         next=request.args.get('next') or request.referrer or None))
 
-@views.route('/oauth-authorized')
+@views.route('/twitter-oauth-authorized')
 @twitter.authorized_handler
-def oauth_authorized(resp):
+def twitter_oauth_authorized(resp):
     next_url = request.args.get('next') or url_for('views.index')
     if resp is None:
         flash(u"You denied the request to sign in.")
@@ -47,8 +47,13 @@ def oauth_authorized(resp):
     user = User.objects.filter(username=resp['screen_name']).first()
     if not user:
         user = User(username=resp['screen_name'],
-                    name=resp['screen_name'],
-                    email='example@example.com')
+                    service='twitter')
+    if user.password is not None:
+        flash('That username exists.') # TODO this is not robust; I should be
+                                       # able to handle both a local account
+                                       # "kobutsu" and a Twitter-auth'ed
+                                       # account "kobutsu"
+        return redirect(url_for('views.login'))
     user.oauth_token = resp['oauth_token']
     user.oauth_secret = resp['oauth_token_secret']
     user.authenticated = True
@@ -60,14 +65,17 @@ def oauth_authorized(resp):
 def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User(username=form.username.data,
-                    name=form.name.data,
-                    email=form.email.data)
-        user.set_password(form.password.data)
-        user.authenticated = True
-        user.save()
-        login_user(user)
-        return redirect(request.args.get("next") or url_for('views.index'))
+        if not User.objects.filter(username=form.username.data):
+            user = User(username=form.username.data,
+                        email=form.email.data,
+                        service='local')
+            user.set_password(form.password.data)
+            user.authenticated = True
+            user.save()
+            login_user(user)
+            return redirect(request.args.get("next") or url_for('views.index'))
+        else:
+            flash("That username is already taken.")
     return render_template('register.html', form=form, session=session)
 
 @views.route('/login/', methods=['GET', 'POST'])
@@ -96,7 +104,8 @@ def login():
 @views.route('/settings/', methods=['GET', 'POST'])
 @login_required
 def settings():
-    return render_template('settings.html')
+    account_type = current_user.service
+    return render_template('settings.html', account_type=account_type)
 
 @views.route('/logout/', methods=['GET', 'POST'])
 @login_required
