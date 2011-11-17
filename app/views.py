@@ -1,7 +1,31 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-from flaskext.login import login_user, login_required, current_user, logout_user
+from flask import (Blueprint, render_template, request, redirect, url_for,
+                   session, flash)
+from flaskext.login import (LoginManager, login_user, login_required,
+                            current_user, logout_user)
+from flaskext.oauth import OAuth
 from app.models import *
 from app.forms import *
+
+login_manager = LoginManager()
+
+oauth = OAuth()
+twitter = oauth.remote_app('twitter',
+    # unless absolute urls are used to make requests, this will be added
+    # before all URLs.  This is also true for request_token_url and others.
+    base_url='http://api.twitter.com/1/',
+    # where flask should look for new request tokens
+    request_token_url='http://api.twitter.com/oauth/request_token',
+    # where flask should exchange the token with the remote application
+    access_token_url='http://api.twitter.com/oauth/access_token',
+    # twitter knows two authorizatiom URLs.  /authorize and /authenticate.
+    # they mostly work the same, but for sign on /authenticate is
+    # expected because this will give the user a slightly different
+    # user interface on the twitter side.
+    authorize_url='http://api.twitter.com/oauth/authenticate',
+    # the consumer keys from the twitter application registry.
+    consumer_key='xBeXxg9lyElUgwZT6AZ0A',
+    consumer_secret='aawnSpNTOVuDCjx7HMh6uSXetjNN8zWLpZwCEU4LBrk'
+)
 
 views = Blueprint('views', __name__, static_folder='../static',
                   template_folder='../templates')
@@ -10,6 +34,36 @@ views = Blueprint('views', __name__, static_folder='../static',
 def index():
     """Render index."""
     return render_template('index.html', session=session)
+
+@twitter.tokengetter
+def get_twitter_token():
+    user = current_user
+    if user.is_authenticated():
+        return user.oauth_token, user.oauth_secret
+
+@views.route('/auth/twitter/')
+def auth_twitter():
+    return twitter.authorize(callback=url_for('views.oauth_authorized',
+        next=request.args.get('next') or request.referrer or None))
+
+@views.route('/oauth-authorized')
+@twitter.authorized_handler
+def oauth_authorized(resp):
+    next_url = request.args.get('next') or url_for('views.index')
+    if resp is None:
+        flash(u"You denied the request to sign in.")
+        return redirect(next_url)
+    user = User.objects.filter(username=resp['screen_name']).first()
+    if not user:
+        user = User(username=resp['screen_name'],
+                    name=resp['screen_name'],
+                    email='example@example.com')
+    user.oauth_token = resp['oauth_token']
+    user.oauth_secret = resp['oauth_token_secret']
+    user.authenticated = True
+    user.save()
+    login_user(user)
+    return redirect(next_url)
 
 @views.route('/register/', methods=['GET', 'POST'])
 def register():
@@ -47,6 +101,11 @@ def login():
             flash("There was an error logging in.")
         redirect(url_for('views.login'))
     return render_template('login.html', form=form, session=session)
+
+@views.route('/settings/', methods=['GET', 'POST'])
+@login_required
+def settings():
+    return render_template('settings.html')
 
 @views.route('/logout/', methods=['GET', 'POST'])
 @login_required

@@ -5,10 +5,12 @@ class User(Document):
     username = StringField(required=True, unique=True)
     name = StringField(required=True)
     email = EmailField(required=True)
-    password = BinaryField(required=True)
+    password = BinaryField(required=False)
     site = URLField()
     authenticated = BooleanField(default=False)
     active = BooleanField(default=True)
+    oauth_token = StringField()
+    oauth_secret = StringField()
     def set_password(self, password):
         self.password = "{SHA}" + sha256(password).digest()
     def check_password(self, password):
