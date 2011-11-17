@@ -1,6 +1,7 @@
 flask
 flask-wtf
 flask-login
+flask-oauth
 mock
 mongoengine
 gunicorn
