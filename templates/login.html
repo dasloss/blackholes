@@ -2,6 +2,15 @@
 
 {% block title %}Login{% endblock %}
 
+{% block css %}
+<style type="text/css">
+    .span8 {
+        border-right: 1px solid #eee;
+        padding-right: 10px;
+    }
+</style>
+{% endblock %}
+
 {% block js %}
 <script type="text/javascript">
 $(function(){
@@ -12,11 +21,18 @@ $(function(){
 
 {% block main %}
 {% from "_formhelpers.html" import render_field %}
-<form id="login" method="post" action="/login/">
-    {{ render_field(form.username) }}
-    {{ render_field(form.password) }}
-    {{ render_field(form.remember) }}
-    <input type="submit" value="Login" />
-</form>
-<p>Or <a href="/auth/twitter/?next=/">sign in with Twitter</a>.</p>
+<div class="row">
+    <div class="span8">
+        <form id="login" method="post" action="/login/">
+            {{ render_field(form.username) }}
+            {{ render_field(form.password) }}
+            {{ render_field(form.remember) }}
+            <div class="actions"><input type="submit" value="Login" class="btn primary" /></div>
+        </form>
+    </div>
+    <div class="span7">
+        <a href="/auth/twitter/?next=/"><img src="/static/sign-in-with-twitter-l.png" alt="Sign in with Twitter" title="Sign in with Twitter" /></a><br />
+        <a href="/auth/facebook/?next=/"><img src="/static/facebook-connect.png" alt="Sign in with Facebook" title="Sign in with Facebook" /></a>
+    </div>
+</div>
 {% endblock %}
