@@ -104,8 +104,12 @@ def login():
 @views.route('/settings/', methods=['GET', 'POST'])
 @login_required
 def settings():
-    account_type = current_user.service
-    return render_template('settings.html', account_type=account_type)
+    form = None
+    if current_user.service == 'local':
+        form = SettingsForm(request.form, email=current_user.email)
+    if request.method == 'POST' and form.validate():
+        pass
+    return render_template('settings.html', form=form)
 
 @views.route('/logout/', methods=['GET', 'POST'])
 @login_required

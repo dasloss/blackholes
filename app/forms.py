@@ -1,4 +1,5 @@
 from wtforms import Form, TextField, PasswordField, BooleanField, validators, ValidationError
+from flaskext.login import current_user
 from app.models import User
 
 class LoginForm(Form):
@@ -15,3 +16,12 @@ class RegistrationForm(Form):
         ])
     confirm = PasswordField('Repeat password', [validators.Required()])
     #accept_tos = BooleanField('I accept the ToS', [validators.Required()])
+
+class SettingsForm(Form):
+    email = TextField('Email', [validators.Required(), validators.Email()])
+    old_password = PasswordField('Old password', [validators.Required()])
+    password = PasswordField('Change password', [
+        validators.Required(),
+        validators.EqualTo('confirm', message='New passwords must match')
+        ])
+    confirm = PasswordField('Repeat password', [validators.Required()])

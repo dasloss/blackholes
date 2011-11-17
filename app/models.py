@@ -3,10 +3,10 @@ from hashlib import sha256
 
 class User(Document):
     username = StringField(required=True, unique=True)
-    name = StringField(required=True)
+    #name = StringField(required=True)
     email = EmailField(required=False)
     password = BinaryField(required=False)
-    site = URLField()
+    #site = URLField()
     authenticated = BooleanField(default=False)
     active = BooleanField(default=True)
     oauth_token = StringField()

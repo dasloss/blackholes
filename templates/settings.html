@@ -4,7 +4,17 @@
 
 {% block main %}
 <h1>Settings</h1>
-<ul>
-    <li>{{ account_type }}</li>
-</ul>
+{% if form %}
+{% from "_formhelpers.html" import render_field %}
+<form id="settings" method="post" action="/settings/">
+    {{ render_field(form.email) }}
+    {{ render_field(form.old_password) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.confirm) }}
+    <div class="actions"><input type="submit" value="Save settings" class="btn primary" /></div>
+</form>
+{% else %}
+<p>Your account is linked to {{ current_user.service.title() }}. All settings
+are stored there.</p>
+{% endif %}
 {% endblock %}
