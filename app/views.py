@@ -128,4 +128,4 @@ def page_not_found(error):
 def page_not_found(error):
     """Custom 500 page."""
     # Insert error logging here.
-    return render_template('500.html', error=error, session=session), 500
+    return render_template('500.html', session=session), 500
