@@ -5,4 +5,3 @@ build
 include
 lib
 TODO.md
-app/settings.py
