@@ -1,8 +1,8 @@
 from flask import (Blueprint, render_template, request, redirect, url_for,
                    session, flash)
-from flaskext.login import (LoginManager, login_user, login_required,
+from flask.ext.login import (LoginManager, login_user, login_required,
                             current_user, logout_user)
-from flaskext.oauth import OAuth
+from flask.ext.oauth import OAuth
 from app.models import *
 from app.forms import *
 

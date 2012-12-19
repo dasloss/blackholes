@@ -1,5 +1,5 @@
 from flask import Flask
-from flaskext.login import LoginManager
+from flask.ext.login import LoginManager
 import settings
 from mongoengine import connect
 from views import views, login_manager

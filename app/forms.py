@@ -1,5 +1,5 @@
 from wtforms import Form, TextField, PasswordField, BooleanField, validators, ValidationError
-from flaskext.login import current_user
+from flask.ext.login import current_user
 from app.models import User
 
 class LoginForm(Form):
