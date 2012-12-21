@@ -3,7 +3,7 @@ Global settings for your application.
 """
 
 # Environment                                                                  
-environment = 'local'
+environment = 'cloud'
 
 # Database settings                                                            
 if environment == 'cloud':
