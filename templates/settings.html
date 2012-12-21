@@ -7,6 +7,7 @@
 {% if form %}
 {% from "_formhelpers.html" import render_field %}
 <form id="settings" method="post" action="/settings/">
+    {{ render_field(form.name) }}
     {{ render_field(form.email) }}
     {{ render_field(form.old_password) }}
     {{ render_field(form.password) }}

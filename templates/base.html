@@ -7,8 +7,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=980">
-
-    <title>{% block title %}Title{% endblock %}</title>
+    <meta name="keywords" content="GFC, Govern for California, political donations, David Crane, Greg Penner, courageous officials, California politics">
+    <meta name="author" content="Dakin Sloss">
+    <meta name="description" content="GFC candidate donation website.">
+    <title>{% block title %}GFC Donations{% endblock %}</title>
 
     <!-- Icons -->
     <link rel="shortcut icon" href="/static/favicon.ico">
@@ -18,6 +20,7 @@
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/bootstrap-responsive.min.css" />
     <link rel="stylesheet" href="/static/css/style.css" />
     {% block css %}
     {% endblock %}
@@ -33,7 +36,7 @@
 <div class="topbar">
     <div class="fill">
         <div class="container">
-            <a href="/" class="brand">Title</a>
+            <a href="/" class="brand">GFC Donations</a>
             <ul class="secondary-nav">
                 <li><a href="/about/">About</a></li>
                 {% if current_user.is_authenticated() %}
@@ -65,7 +68,7 @@
 </div>
 <footer>
 <div class="container">
-    <p><small>&copy; 2011 Your Awesome Business</small></p>
+    <p><small>&copy; 2013 Govern for California</small></p>
 </div>
 </footer>
 <body>

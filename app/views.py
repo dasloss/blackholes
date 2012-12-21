@@ -22,9 +22,36 @@ views = Blueprint('views', __name__, static_folder='../static',
                   template_folder='../templates')
 
 @views.route('/')
+@login_required
 def index():
-    """Render index."""
-    return render_template('index.html', session=session)
+    candidates = Candidate.objects
+    return render_template('index.html',candidates=candidates,session=session)
+
+@views.route('/about/')
+def about():
+    """Render about."""
+    return render_template('about.html', session=session)
+
+@views.route('/addcandidate/', methods=['GET', 'POST'])
+@login_required
+def addcandidate():
+    if current_user.username == 'dakinsloss':
+        form = CandidateForm(request.form)
+        if request.method == 'POST' and form.validate():
+            filename = images.save(request.files['img'])
+            candidate = Candidate(candidatename=form.candidatename.data,
+                            electedoffice=form.electedoffice.data,
+                            maxdonation=form.maxdonation.data,
+                            bio=form.bio.data,
+                            website=form.website.data,
+                            paymentkey=form.paymentkey.data,
+                            imgpth = filename)
+            candidate.save()
+            return redirect(url_for('views.index'))
+    else:
+        flash("You do not have permission to access this page.")
+        return url_for('views.index')
+    return render_template('addcandidate.html', form=form, session=session)
 
 @twitter.tokengetter
 def get_twitter_token():
@@ -66,7 +93,8 @@ def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         if not User.objects.filter(username=form.username.data):
-            user = User(username=form.username.data,
+            user = User(name=form.name.data,
+                        username=form.username.data,
                         email=form.email.data,
                         service='local')
             user.set_password(form.password.data)
@@ -106,7 +134,7 @@ def login():
 def settings():
     form = None
     if current_user.service == 'local':
-        form = SettingsForm(request.form, email=current_user.email)
+        form = SettingsForm(request.form, email=current_user.email, name=current_user.name)
     if request.method == 'POST' and form.validate():
         pass
     return render_template('settings.html', form=form)

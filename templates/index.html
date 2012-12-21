@@ -1,5 +1,52 @@
 {% extends "base.html" %}
 
+{% block js %}
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/jquery.imagesloaded.min.js"></script>
+<script src="/static/js/jquery.masonry.min.js"></script>
+{% endblock %}
+
 {% block main %}
-<h1>Hello, world!</h1>
+<h1>Candidates</h1>
+<style> .thumbnail {text-align: center} </style>                               
+    <div class="container-fluid" id="container">
+        <ul class="thumbnails">
+            {% for candidate in candidates %}
+            <li class="span3">
+                <div class="thumbnail">
+                   <a href="#Modal{{ candidate.candidatename }}" data-toggle="modal"><img src={{ candidate.imgpath }} alt=""></a>
+                   <div class="caption">
+                       <p> <a href={{ candidate.website }} id={{ candidate.candidatename }} class="btn btn-link" rel="popover" data-placement="bottom" data-content="{{ candidate.electedoffice }}" data-animation="true" target="_blank">{{ candidate.candidatename }}</a></p>
+                    </div>
+                 </div>
+            <li>
+            <div class="modal hide fade" id="Modal{{ candidate.candidatename }}">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="mod\
+al">×</button>
+                    <h3 id="myModalLabel">{{ candidate.candidatename }}</h3>
+                </div>
+                <div class="modal-body">
+                    <p>{{ candidate.bio }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <script> $(function ()  { $("#{{ candidate.candidatename }}").popover();  }); </script>
+            {% endfor %}
+        </ul>
+    </div>
+
+<script>
+      var $container = $("#container");
+      $container.imagesLoaded( function(){
+         $container.masonry({
+            itemSelector : ".span3",
+            columnWidth : 100,
+            isFitWidth: true,
+            isAnimated: true
+          });
+      }); 
+</script>
 {% endblock %}

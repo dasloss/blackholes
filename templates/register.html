@@ -24,8 +24,9 @@ $(function(){
 <div class="row">
     <div class="span8">
         <form id="register" method="post" action="/register/">
+	    {{ render_field(form.name) }}
+	    {{ render_field(form.email) }}
             {{ render_field(form.username) }}
-            {{ render_field(form.email) }}
             {{ render_field(form.password) }}
             {{ render_field(form.confirm) }}
             <div class="actions"><input type="submit" value="Create" class="btn primary" /></div>
