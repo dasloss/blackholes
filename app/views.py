@@ -24,7 +24,7 @@ views = Blueprint('views', __name__, static_folder='../static',
 @views.route('/')
 @login_required
 def index():
-    candidates = Candidate.objects
+    candidates = query_candidates()
     return render_template('index.html',candidates=candidates,session=session)
 
 @views.route('/about/')

@@ -1,6 +1,7 @@
 from mongoengine import *
 from hashlib import sha256
-# from pymongo import Connection
+from pymongo import Connection
+import settings
 
 class User(Document):
     username = StringField(required=True)
@@ -34,31 +35,29 @@ class Candidate(Document):
     paymentkey = StringField(required=True)
     imgpath = StringField(required=False)
 
-''' pymongo approach to db manipulation
 _CONN = None
 def get_mongo_connection():
     global _CONN
     if _CONN is None:
-        if environment == "local":
-            _CONN = Connection(host=DB_HOST, port=DB_PORT)
-        elif environment == "cloud":
-            _CONN = Connection(MONGO_URI)
+        if settings.environment == "local":
+            _CONN = Connection(host=settings.DB_HOST, port=settings.DB_PORT)
+        elif settings.environment == "cloud":
+            _CONN = Connection(settings.MONGO_URI)
     return _CONN
 
 def get_db():
-    return get_mongo_connection()[DB]
+    return get_mongo_connection()[settings.DB]
 
 def query_candidates():
     db = get_db()
-    for candidate in db.candidates.find({}):
+    for candidate in db.candidate.find({}):
         candidate = Candidate(**candidate)
         yield candidate
 
-def insert_candidate(candidate):
+def insert_candidates(candidate):
     db = get_db()
-    db.candidates.insert(vars(thing))
+    db.candidate.insert(vars(thing))
 
 def clear_candidates():
     db = get_db()
-    db.candidates.remove()
-'''
+    db.candidate.remove()

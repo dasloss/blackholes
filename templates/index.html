@@ -14,16 +14,14 @@
             {% for candidate in candidates %}
             <li class="span3">
                 <div class="thumbnail">
-                   <a href="#Modal{{ candidate.candidatename }}" data-toggle="modal"><img src={{ candidate.imgpath }} alt=""></a>
+                   <a href="#Modal{{ candidate.candidatename.replace(" ","") }}" data-toggle="modal"><img src={{ candidate.imgpath }} alt=""></a>
                    <div class="caption">
-                       <p> <a href={{ candidate.website }} id={{ candidate.candidatename }} class="btn btn-link" rel="popover" data-placement="bottom" data-content="{{ candidate.electedoffice }}" data-animation="true" target="_blank">{{ candidate.candidatename }}</a></p>
+                       <p> <a href={{ candidate.website}} target="_blank">{{ candidate.candidatename }}</a></p>
                     </div>
                  </div>
             <li>
-            <div class="modal hide fade" id="Modal{{ candidate.candidatename }}">
+            <div class="modal hide fade" id="Modal{{ candidate.candidatename.replace(" ","") }}">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="mod\
-al">×</button>
                     <h3 id="myModalLabel">{{ candidate.candidatename }}</h3>
                 </div>
                 <div class="modal-body">
@@ -33,7 +31,6 @@ al">×</button>
                     <button class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
-            <script> $(function ()  { $("#{{ candidate.candidatename }}").popover();  }); </script>
             {% endfor %}
         </ul>
     </div>

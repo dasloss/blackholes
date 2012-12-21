@@ -1,0 +1,47 @@
+[
+{
+        "candidatename" : "David Crane",
+	"elected office" : "State Controller", 
+        "maxdonation" : "6200",
+        "bio" : "David teaches at Stanford and is President of Govern for California.",
+        "imgpath" : "/static/img/davidcrane.png",
+        "website" : "http://davidgcrane.com",
+	"paymentkey" : "pk_test_BHJHfU6oDQPwau8nycmdeSHS"
+},
+{
+        "candidatename" : "Shaudi Fulp",
+	"electedoffice" : "Assembly District 3", 
+        "maxdonation" : "4100",
+        "bio" : "Shaudi was chief lobbyist for Chevron and runs Govern for California.",
+        "imgpath" : "/static/img/shaudifulp.png",
+        "website" : "http://governforcalifornia.org",
+	"paymentkey" : "pk_test_BHJHfU6oDQPwau8nycmdeSHS"
+},
+{
+        "candidatename" : "Autumn Carter",
+	"electedoffice" : "Senate District 27", 
+        "maxdonation" : "4100",
+        "bio" : "Autumn graduated from Stanford and runs California Common Sense.",
+        "imgpath" : "/static/img/autumncarter.png",
+        "website" : "http://cacs.org",
+	"paymentkey" : "pk_test_BHJHfU6oDQPwau8nycmdeSHS"
+},
+{
+        "candidatename" : "Mike Polyakov",
+	"electedoffice" : "Assembly District 19", 
+        "maxdonation" : "4100",
+        "bio" : "Mike did his phd at UC Berkeley and is Research Director for CACS.",
+        "imgpath" : "/static/img/mikepolyakov.png",
+        "website" : "http://cacs.org",
+	"paymentkey" : "pk_test_BHJHfU6oDQPwau8nycmdeSHS"
+},
+{
+        "candidatename" : "Andrew Crutchfield",
+	"electedoffice" : "Palo Alto City Council", 
+        "maxdonation" : "500",
+        "bio" : "Andrew graduated from Harvard and works for CACS and Govern for California.",
+        "imgpath" : "/static/img/andrewcrutchfield.png",
+        "website" : "http://cacs.org",
+	"paymentkey" : "pk_test_BHJHfU6oDQPwau8nycmdeSHS"
+}
+]
