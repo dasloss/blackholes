@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block main %}
+{% from "_formhelpers.html" import render_field %}
+<h1>Admin</h1>
+<form id="candidatestatus" method="post" action="/admin/" >
+  {% for user in users %}
+  {{ render_field(form.{{ user.username }}) }}
+  {% endfor %}
+  <div class="actions"><input type="submit" value="Save" class="btn primary" />
+  </div> 
+</form>
+{% endblock %}
