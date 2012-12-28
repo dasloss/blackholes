@@ -1,6 +1,5 @@
 from mongoengine import *
 from hashlib import sha256
-from pymongo import Connection
 import settings
 
 class User(Document):
@@ -10,8 +9,7 @@ class User(Document):
     password = BinaryField(required=False)
     active = BooleanField(default=True)
     service = StringField()
-    oauth_token = StringField()
-    oauth_secret = StringField()
+    stripe_customer_id = StringField(required=False)
     authenticated = BooleanField(default=False)
     def is_authenticated(self):
         return self.authenticated
@@ -25,39 +23,22 @@ class User(Document):
         return False
     def get_id(self):
         return self.username
-
-class Candidate(Document):
-    candidatename = StringField(required=True)
-    electedoffice = StringField(required=True)
-    maxdonation = IntField(required=True)
-    bio = StringField(required=True)
-    website = URLField(required=True, verify_exists=True)
-    paymentkey = StringField(required=True)
+    def set_stripe_customer_id(self, stripe_customer_id):
+        self.stripe_customer_id = stripe_customer_id
+    meta = {'allow_inheritance': True}
+    #Candidate fields
+    candidate = BooleanField(default=False)
+    electedoffice = StringField(required=False)
+    maxdonation = IntField(required=False)
+    bio = StringField(required=False)
+    website = URLField(required=False, verify_exists=True)
     imgpath = StringField(required=False)
-
-_CONN = None
-def get_mongo_connection():
-    global _CONN
-    if _CONN is None:
-        if settings.environment == "local":
-            _CONN = Connection(host=settings.DB_HOST, port=settings.DB_PORT)
-        elif settings.environment == "cloud":
-            _CONN = Connection(settings.MONGO_URI)
-    return _CONN
-
-def get_db():
-    return get_mongo_connection()[settings.DB]
-
-def query_candidates():
-    db = get_db()
-    for candidate in db.candidate.find({}):
-        candidate = Candidate(**candidate)
-        yield candidate
-
-def insert_candidates(candidate):
-    db = get_db()
-    db.candidate.insert(vars(thing))
-
-def clear_candidates():
-    db = get_db()
-    db.candidate.remove()
+    token = StringField(required=False)                                  
+    connected = BooleanField(default=False)
+    imgpath = StringField(required=False)
+    def set_token(self, token):
+        self.token = token
+    def is_connected(self):
+        return self.connected
+    def is_candidate(self):
+        return self.candidate
