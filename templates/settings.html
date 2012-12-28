@@ -12,8 +12,21 @@
     {{ render_field(form.old_password) }}
     {{ render_field(form.password) }}
     {{ render_field(form.confirm) }}
+    {% if candidate == True %}
+    {{ render_field(form.electedoffice) }}
+    {{ render_field(form.maxdonation) }}
+    {{ render_field(form.bio) }}
+    {{ render_field(form.website) }}
+    {% endif %}
     <div class="actions"><input type="submit" value="Save settings" class="btn primary" /></div>
 </form>
+{% if candidate == True %}
+{% if connected == True %}
+<p>You are logged in to Stripe</p>
+{% else %}
+<p><a href="/authorize/"><img src="/static/blue.png" alt="Connect to Stripe" title="Connect to Stripe"></a></p>
+{% endif %}
+{% endif %}
 {% else %}
 <p>Your account is linked to {{ current_user.service.title() }}. All settings
 are stored there.</p>
