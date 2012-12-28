@@ -2,21 +2,14 @@ from flask import (Blueprint, render_template, request, redirect, url_for,
                    session, flash)
 from flask.ext.login import (LoginManager, login_user, login_required,
                             current_user, logout_user)
-from flask.ext.oauth import OAuth
 from app.models import *
 from app.forms import *
+from app.settings import PUBLISHABLE_KEY, SECRETIVE_KEY, CLIENT_ID
+import stripe
+import urllib
+import requests
 
 login_manager = LoginManager()
-
-oauth = OAuth()
-twitter = oauth.remote_app('twitter',
-    base_url='http://api.twitter.com/1/',
-    request_token_url='http://api.twitter.com/oauth/request_token',
-    access_token_url='http://api.twitter.com/oauth/access_token',
-    authorize_url='http://api.twitter.com/oauth/authenticate',
-    consumer_key='xBeXxg9lyElUgwZT6AZ0A',
-    consumer_secret='aawnSpNTOVuDCjx7HMh6uSXetjNN8zWLpZwCEU4LBrk'
-)
 
 views = Blueprint('views', __name__, static_folder='../static',
                   template_folder='../templates')
@@ -24,69 +17,80 @@ views = Blueprint('views', __name__, static_folder='../static',
 @views.route('/')
 @login_required
 def index():
-    candidates = query_candidates()
+    candidates = User.objects(candidate=True)
     return render_template('index.html',candidates=candidates,session=session)
+
+@views.route('/authorize/')
+@login_required
+def authorize():
+  site   = 'https://connect.stripe.com/oauth/authorize'
+  params = {'response_type': 'code',
+            'scope': 'read_write',
+            'client_id': CLIENT_ID
+           }
+  # Redirect to Stripe /oauth/authorize endpoint
+  url = site + '?' + urllib.urlencode(params)
+  return redirect(url)
+ 
+@views.route('/oauth/callback/')
+@login_required
+def callback():
+  code   = request.args.get('code')
+  header = {'Authorization': 'Bearer %s' % SECRETIVE_KEY}
+  data   = {'grant_type': 'authorization_code',
+            'client_id': CLIENT_ID,
+            'code': code
+           }
+  # Make /oauth/token endpoint POST request
+  url ='https://connect.stripe.com/oauth/token'
+  resp = requests.post(url, params=data, headers=header)
+  # Grab access_token (use this as your user's API key)
+  jsontoken = resp.json()#.get('access_token')
+  token = jsontoken['access_token']
+  current_user.set_token(token)
+  current_user.connected = True
+  current_user.save()
+  return redirect(url_for('views.settings'))
 
 @views.route('/about/')
 def about():
     """Render about."""
     return render_template('about.html', session=session)
 
-@views.route('/addcandidate/', methods=['GET', 'POST'])
+@views.route('/donate/', methods=['GET', 'POST'])
 @login_required
-def addcandidate():
-    if current_user.username == 'dakinsloss':
-        form = CandidateForm(request.form)
-        if request.method == 'POST' and form.validate():
-            filename = images.save(request.files['img'])
-            candidate = Candidate(candidatename=form.candidatename.data,
-                            electedoffice=form.electedoffice.data,
-                            maxdonation=form.maxdonation.data,
-                            bio=form.bio.data,
-                            website=form.website.data,
-                            paymentkey=form.paymentkey.data,
-                            imgpth = filename)
-            candidate.save()
-            return redirect(url_for('views.index'))
-    else:
-        flash("You do not have permission to access this page.")
-        return url_for('views.index')
-    return render_template('addcandidate.html', form=form, session=session)
+def donate():
+    return render_template('donate.html', pubkey=PUBLISHABLE_KEY)
 
-@twitter.tokengetter
-def get_twitter_token():
-    user = current_user
-    if user.is_authenticated():
-        return user.oauth_token, user.oauth_secret
-
-@views.route('/auth/twitter/')
-def auth_twitter():
-    return twitter.authorize(callback=url_for('views.twitter_oauth_authorized',
-        next=request.args.get('next') or request.referrer or None))
-
-@views.route('/twitter-oauth-authorized')
-@twitter.authorized_handler
-def twitter_oauth_authorized(resp):
-    next_url = request.args.get('next') or url_for('views.index')
-    if resp is None:
-        flash(u"You denied the request to sign in.")
-        return redirect(next_url)
-    user = User.objects.filter(username=resp['screen_name']).first()
-    if not user:
-        user = User(username=resp['screen_name'],
-                    service='twitter')
-    if user.password is not None:
-        flash('That username exists.') # TODO this is not robust; I should be
-                                       # able to handle both a local account
-                                       # "kobutsu" and a Twitter-auth'ed
-                                       # account "kobutsu"
-        return redirect(url_for('views.login'))
-    user.oauth_token = resp['oauth_token']
-    user.oauth_secret = resp['oauth_token_secret']
-    user.authenticated = True
-    user.save()
-    login_user(user, remember=True)
-    return redirect(next_url)
+@views.route('/charge/', methods=['GET', 'POST'])
+@login_required
+def charge():
+    # set secret key, get the credit card details submitted by the form   
+    stripe.api_key = SECRETIVE_KEY
+    token = request.form['stripeToken']
+    if current_user.stripe_customer_id == None:
+        # create a Customer                                             
+        customer = stripe.Customer.create(
+            card=token,
+            description=current_user.username
+        )
+        # save the customer ID in your database so you can use it later  
+        current_user.set_stripe_customer_id(customer.id)
+        current_user.save()
+    # later retrieve id and charge each donation          
+    customer_id = current_user.stripe_customer_id
+    for recipient in recipients:
+        chargetoken = stripe.Token.create(
+            customer=customer_id,
+            api_key=recipient.token # recipient's Stripe auth token
+        )
+        stripe.Charge.create(
+            amount=recipient.amount,                       
+            currency="usd",
+            card=chargetoken,
+            description=current_user.username + " to " + recipient.name
+        )
+    return render_template('charge.html')
 
 @views.route('/register/', methods=['GET', 'POST'])
 def register():
@@ -133,11 +137,21 @@ def login():
 @login_required
 def settings():
     form = None
+    candidate = current_user.is_candidate
+    connected = current_user.is_connected
     if current_user.service == 'local':
-        form = SettingsForm(request.form, email=current_user.email, name=current_user.name)
+        form = SettingsForm(request.form, email=current_user.email, name=current_user.name, electedoffice=current_user.electedoffice, maxdonation=current_user.maxdonation, bio=current_user.bio, website=current_user.website)
     if request.method == 'POST' and form.validate():
-        pass
-    return render_template('settings.html', form=form)
+        current_user.email = form.email.data
+        current_user.name = form.name.data
+        current_user.electedoffice = form.electedoffice.data
+        current_user.maxdonation = form.maxdonation.data
+        current_user.bio = form.bio.data
+        current_user.website = form.website.data
+        if form.password.data != None:
+            current_user.set_password(form.password.data)
+        current_user.save()
+    return render_template('settings.html', form=form, candidate=candidate, connected=connected)
 
 @views.route('/logout/', methods=['GET', 'POST'])
 @login_required
@@ -146,6 +160,29 @@ def logout():
     current_user.save()
     logout_user()
     return redirect(url_for('views.index'))
+
+@views.route('/admin/', methods=['GET', 'POST'])
+@login_required
+def admin():
+    if current_user.username == 'admin':
+        users = User.objects
+        class F(SelectionForm):
+            pass
+        for user in users:
+            username = user.username
+            setattr(F, username, BooleanField(username))
+        form = F(request.form, username=user.candidate)
+        if request.method == 'POST' and form.validate():
+            for user in users:
+                if user.username in request.form:
+                    user.candidate = True
+                else:
+                    user.candidate = False
+                user.save()
+        return render_template('admin.html',users=users,form=form)
+    else:
+        flash("You are not an authorized administrator")
+        return redirect(url_for('views.index'))
 
 @views.app_errorhandler(404)
 def page_not_found(error):
