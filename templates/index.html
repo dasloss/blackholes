@@ -6,23 +6,28 @@
 <script src="/static/js/jquery.masonry.min.js"></script>
 {% endblock %}
 
+{% block footer %}
+<a href="/donate" class="btn btn-primary">Donate</a> 
+{% endblock %}
+
 {% block main %}
-<h1>Candidates</h1>
-<style> .thumbnail {text-align: center} </style>                               
+<h1>Choose Candidates</h1>
+<style> .thumbnail {text-align: center} </style>
     <div class="container-fluid" id="container">
         <ul class="thumbnails">
             {% for candidate in candidates %}
             <li class="span3">
                 <div class="thumbnail">
-                   <a href="#Modal{{ candidate.candidatename.replace(" ","") }}" data-toggle="modal"><img src={{ candidate.imgpath }} alt=""></a>
+                   <a href="#Modal{{ candidate.name.replace(" ","") }}" data-toggle="modal"><img src={{ candidate.imgpath }} alt=""></a>
                    <div class="caption">
-                       <p> <a href={{ candidate.website}} target="_blank">{{ candidate.candidatename }}</a></p>
+                       <p> <a href={{ candidate.website}} target="_blank">{{ candidate.name }}</a><br> <input type="checkbox" class="pull-right" id="Box{{ candidate.name.replace(" ","") }}" checked></p>
+		       <p>{{ candidate.electedoffice }}</p>
                     </div>
                  </div>
             <li>
-            <div class="modal hide fade" id="Modal{{ candidate.candidatename.replace(" ","") }}">
+            <div class="modal hide fade" id="Modal{{ candidate.name.replace(" ","") }}">
                 <div class="modal-header">
-                    <h3 id="myModalLabel">{{ candidate.candidatename }}</h3>
+                    <h3 id="myModalLabel">{{ candidate.name }}, {{ candidate.electedoffice }}</h3>
                 </div>
                 <div class="modal-body">
                     <p>{{ candidate.bio }}</p>
