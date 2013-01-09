@@ -168,10 +168,13 @@ def admin():
         users = User.objects
         class F(SelectionForm):
             pass
+        class specials:
+            pass
         for user in users:
             username = user.username
             setattr(F, username, BooleanField(username))
-        form = F(request.form, username=user.special)
+            setattr(specials, username, user.special)
+        form = F(request.form, specials)
         if request.method == 'POST' and form.validate():
             for user in users:
                 if user.username in request.form:
@@ -179,6 +182,8 @@ def admin():
                 else:
                     user.special = False
                 user.save()
+                setattr(specials, user.username, user.special)
+            form = F(request.form, specials)
         return render_template('admin.html', form=form)
     else:
         flash("You are not an authorized administrator")
