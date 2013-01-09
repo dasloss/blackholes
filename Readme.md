@@ -13,8 +13,8 @@ To install python, mongo, and heroku on a mac:
 6. run: sudo port install gevent (needed for development server)
 
 To begin on a mac (while in a local copy of the starter repo):
-1. python /opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin/virtualenv-2.7 env 
-2. source env/bin/activate (now you should see env at the beginning of the terminal command line)
-3. pip install -r requirements.txt (installing flask, extensions, mongoengine, ipython, etc...)
-4. python loaddata.py (populates initial data from data.json in app folder)
-5. foreman start Procfile.dev (runs in development environment)
+1. run: python /opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin/virtualenv-2.7 env 
+2. run:source env/bin/activate (now you should see env at the beginning of the terminal command line)
+3. run: pip install -r requirements.txt (installing flask, extensions, mongoengine, ipython, etc...)
+4. run: python loaddata.py (populates initial data from data.json in app folder)
+5. run: foreman start Procfile.dev (runs in development environment)
