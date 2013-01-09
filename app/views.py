@@ -17,8 +17,8 @@ views = Blueprint('views', __name__, static_folder='../static',
 @views.route('/')
 @login_required
 def index():
-    candidates = User.objects(candidate=True)
-    return render_template('index.html',candidates=candidates,session=session)
+    specials = User.objects(special=True)
+    return render_template('index.html',specials=specials,session=session)
 
 @views.route('/authorize/')
 @login_required
@@ -57,10 +57,10 @@ def about():
     """Render about."""
     return render_template('about.html', session=session)
 
-@views.route('/donate/', methods=['GET', 'POST'])
+@views.route('/pay/', methods=['GET', 'POST'])
 @login_required
-def donate():
-    return render_template('donate.html', pubkey=PUBLISHABLE_KEY)
+def pay():
+    return render_template('pay.html', pubkey=PUBLISHABLE_KEY)
 
 @views.route('/charge/', methods=['GET', 'POST'])
 @login_required
@@ -79,6 +79,7 @@ def charge():
         current_user.save()
     # later retrieve id and charge each donation          
     customer_id = current_user.stripe_customer_id
+    recipients = User.objects(special=True)
     for recipient in recipients:
         chargetoken = stripe.Token.create(
             customer=customer_id,
@@ -87,7 +88,7 @@ def charge():
         stripe.Charge.create(
             amount=recipient.amount,                       
             currency="usd",
-            card=chargetoken,
+            card=chargetoken['id'],
             description=current_user.username + " to " + recipient.name
         )
     return render_template('charge.html')
@@ -137,21 +138,20 @@ def login():
 @login_required
 def settings():
     form = None
-    candidate = current_user.is_candidate
+    special = current_user.is_special
     connected = current_user.is_connected
     if current_user.service == 'local':
-        form = SettingsForm(request.form, email=current_user.email, name=current_user.name, electedoffice=current_user.electedoffice, maxdonation=current_user.maxdonation, bio=current_user.bio, website=current_user.website)
+        form = SettingsForm(request.form, email=current_user.email, name=current_user.name, special_name=current_user.special_name, special_info=current_user.special_info, special_website=current_user.special_website)
     if request.method == 'POST' and form.validate():
         current_user.email = form.email.data
         current_user.name = form.name.data
-        current_user.electedoffice = form.electedoffice.data
-        current_user.maxdonation = form.maxdonation.data
-        current_user.bio = form.bio.data
-        current_user.website = form.website.data
+        current_user.special_name = form.special_name.data
+        current_user.special_info = form.special_info.data
+        current_user.special_website = form.special_website.data
         if form.password.data != None:
             current_user.set_password(form.password.data)
         current_user.save()
-    return render_template('settings.html', form=form, candidate=candidate, connected=connected)
+    return render_template('settings.html', form=form, special=special, connected=connected)
 
 @views.route('/logout/', methods=['GET', 'POST'])
 @login_required
@@ -171,15 +171,15 @@ def admin():
         for user in users:
             username = user.username
             setattr(F, username, BooleanField(username))
-        form = F(request.form, username=user.candidate)
+        form = F(request.form, username=user.special)
         if request.method == 'POST' and form.validate():
             for user in users:
                 if user.username in request.form:
-                    user.candidate = True
+                    user.special = True
                 else:
-                    user.candidate = False
+                    user.special = False
                 user.save()
-        return render_template('admin.html',users=users,form=form)
+        return render_template('admin.html', form=form)
     else:
         flash("You are not an authorized administrator")
         return redirect(url_for('views.index'))

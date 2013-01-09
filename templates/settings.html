@@ -12,15 +12,14 @@
     {{ render_field(form.old_password) }}
     {{ render_field(form.password) }}
     {{ render_field(form.confirm) }}
-    {% if candidate == True %}
-    {{ render_field(form.electedoffice) }}
-    {{ render_field(form.maxdonation) }}
-    {{ render_field(form.bio) }}
-    {{ render_field(form.website) }}
+    {% if special == True %}
+    {{ render_field(form.special_name) }}
+    {{ render_field(form.special_info) }}
+    {{ render_field(form.special_website) }}
     {% endif %}
     <div class="actions"><input type="submit" value="Save settings" class="btn primary" /></div>
 </form>
-{% if candidate == True %}
+{% if special == True %}
 {% if connected == True %}
 <p>You are logged in to Stripe</p>
 {% else %}

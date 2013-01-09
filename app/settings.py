@@ -10,11 +10,11 @@ type_of_stripe = 'testing'
 if environment == 'cloud':
     DB = ''
     DB_HOST = ''
-    DB_PORT = 
+    DB_PORT = 0
     DB_USER = ''
     DB_PASS = ''
 elif environment == 'local':
-    DB = ''
+    DB = 'starter'
     DB_HOST = 'localhost'
     DB_PORT = 27017
     DB_USER = ''                                                         

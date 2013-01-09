@@ -30,11 +30,10 @@ class SettingsForm(Form):
         validators.EqualTo('confirm', message='New passwords must match')
         ])
     confirm = PasswordField('Repeat password', [validators.Required()])
-    #candidate fields
-    electedoffice = TextField('Elected Office', [])
-    maxdonation = IntegerField('Maximum Donation', [])
-    bio = TextAreaField('Bio', [])
-    website = TextField('Website', [])
+    # special fields
+    special_name = TextField('Special Name', [])
+    special_info = TextAreaField('Special Info', [])
+    special_website = TextField('Special Website', [])
     imgupload = FileField('Image File', validators = [file_required(),
                                        file_allowed(images, "Images only!")])
 
