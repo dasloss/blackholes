@@ -10,7 +10,6 @@ To install python, mongo, and heroku on a mac:
 3. run: sudo port install mongodb
 4. install heroku toolbelt, https://toolbelt.heroku.com/ (foreman, git, heroku client)
 5. set up github, https://help.github.com/articles/set-up-git and then fork/clone this repo
-6. run: sudo port install gevent (needed for development server)
 
 To begin on a mac (while in a local copy of the starter repo):
 1. run: python /opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin/virtualenv-2.7 env 
