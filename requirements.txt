@@ -5,3 +5,4 @@ flask-login
 mock
 mongoengine
 gunicorn
+ipython
