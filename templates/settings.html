@@ -7,24 +7,15 @@
 {% if form %}
 {% from "_formhelpers.html" import render_field %}
 <form id="settings" method="post" action="/settings/">
-    {{ render_field(form.name) }}
-    {{ render_field(form.email) }}
-    {{ render_field(form.old_password) }}
-    {{ render_field(form.password) }}
-    {{ render_field(form.confirm) }}
-    {% if special == True %}
-    {{ render_field(form.special_name) }}
-    {{ render_field(form.special_info) }}
-    {{ render_field(form.special_website) }}
-    {% endif %}
+  {% for field in form %}
+    {{ render_field(field) }}
+  {% endfor %}
     <div class="actions"><input type="submit" value="Save settings" class="btn primary" /></div>
 </form>
-{% if special == True %}
 {% if connected == True %}
 <p>You are logged in to Stripe</p>
 {% else %}
 <p><a href="/authorize/"><img src="/static/blue.png" alt="Connect to Stripe" title="Connect to Stripe"></a></p>
-{% endif %}
 {% endif %}
 {% else %}
 <p>Your account is linked to {{ current_user.service.title() }}. All settings

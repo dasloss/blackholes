@@ -6,37 +6,11 @@
 <script src="/static/js/jquery.masonry.min.js"></script>
 {% endblock %}
 
-{% block footer %}
-<a href="/donate" class="btn btn-primary">Pay</a> 
-{% endblock %}
-
 {% block main %}
-<h1>Choose Who to Pay</h1>
+<h1>Index</h1>
 <style> .thumbnail {text-align: center} </style>
     <div class="container-fluid" id="container">
         <ul class="thumbnails">
-            {% for special in specials %}
-            <li class="span3">
-                <div class="thumbnail">
-                   <a href="#Modal{{ special.name.replace(" ","") }}" data-toggle="modal"><img src={{ special.special_img }} alt=""></a>
-                   <div class="caption">
-                       <p> <a href={{ special.special_website }} target="_blank">{{ special.name }}</a><br> <input type="checkbox" class="pull-right" id="Box{{ special.name.replace(" ","") }}" checked></p>
-		       <p>{{ special.special_name }}</p>
-                    </div>
-                 </div>
-            <li>
-            <div class="modal hide fade" id="Modal{{ special.name.replace(" ","") }}">
-                <div class="modal-header">
-                    <h3 id="myModalLabel">{{ special.name }}, {{ special.special_name }}</h3>
-                </div>
-                <div class="modal-body">
-                    <p>{{ special.special_info }}</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-            {% endfor %}
         </ul>
     </div>
 
