@@ -4,3 +4,4 @@ flask-login
 mongoengine
 gunicorn
 google-api-python-client
+oauth2

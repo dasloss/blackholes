@@ -4,12 +4,18 @@ from flask.ext.login import (LoginManager, login_user, login_required,
                             current_user, logout_user)
 from app.models import User
 from app.forms import LoginForm, RegistrationForm, SettingsForm
-import urllib, stripe, requests, os, json
+import os, json
+from oauth2client.client import OAuth2WebServerFlow 
 
 login_manager = LoginManager()
 
 views = Blueprint('views', __name__, static_folder='../static',
                   template_folder='../templates')
+
+flow = OAuth2WebServerFlow(client_id=CLIENT_ID,
+                  client_secret=CLIENT_SECRET,
+                  scope='https://www.googleapis.com/auth/calendar',
+                  redirect_uri='https://localhost:5000/oauth/callback')
 
 @views.route('/')
 @login_required
@@ -87,37 +93,27 @@ def logout():
     flash("You logged out successfully.")
     return redirect(url_for('views.login'))
 
-@views.route('/authorize/gcal/')
+@views.route('/authorize/')
 @login_required
-def gcalauth():
-  site   = 'https://connect.stripe.com/oauth/authorize'
-  params = {'response_type': 'code',
-            'scope': 'read_write',
-            'client_id': CLIENT_ID
-           }
-  # Redirect to Stripe /oauth/authorize endpoint                               
-  url = site + '?' + urllib.urlencode(params)
-  return redirect(url)
+def authorize():
+    url = flow.step1_get_authorize_url()
+    return redirect(url)
 
-@views.route('/callback/gcal/')
+@views.route('/oauth/callback/')
 @login_required
-def gcalcallback():
-  code   = request.args.get('code')
-  header = {'Authorization': 'Bearer %s' % SECRETIVE_KEY}
-  data   = {'grant_type': 'authorization_code',
-            'client_id': CLIENT_ID,
-            'code': code
-           }
-  # Make /oauth/token endpoint POST request                                    
-  url ='https://connect.stripe.com/oauth/token'
-  resp = requests.post(url, params=data, headers=header)
-  # Grab access_token (use this as your user's API key)                        
-  jsontoken = resp.json()#.get('access_token')                                
-  token = jsontoken['access_token']
-  current_user.set_token(token)
-  current_user.connected = True
-  current_user.save()
-  return redirect(url_for('views.settings'))
+def callback():
+    code   = request.args.get('code')
+    if code:
+        credentials = flow.step2_exchange(code)
+        
+        current_user.set_token(token)
+        current_user.connected = True
+        current_user.save()
+        flash("You connected to Google Calendar.")
+    else: 
+        error = request.args.get('error')
+        flash("Connecation failed because: "+error)
+    return redirect(url_for('views.settings'))
 
 @views.app_errorhandler(404)
 def page_not_found(error):

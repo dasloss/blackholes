@@ -26,5 +26,9 @@ elif environment == 'testing':
     DB_PASS = ''
 MONGO_URI=''
 
+# Google settings
+CLIENT_ID = "1050823384007.apps.googleusercontent.com"
+CLIENT_SECRET = "MMdsIzvHXvBFXDZ2FDLk82lJ"
+
 # App settings                                                                 
 SECRET_KEY = ''
