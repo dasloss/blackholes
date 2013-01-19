@@ -26,18 +26,3 @@ class User(Document):
     def set_stripe_customer_id(self, stripe_customer_id):
         self.stripe_customer_id = stripe_customer_id
     meta = {'allow_inheritance': True}
-    # Special user fields who get money from other users
-    special = BooleanField(default=False)
-    special_name = StringField(required=False)
-    special_info = StringField(required=False)
-    special_website = URLField(required=False, verify_exists=True)
-    special_info = StringField(required=False)
-    token = StringField(required=False)                            
-    connected = BooleanField(default=False)
-    special_img = StringField(required=False)
-    def set_token(self, token):
-        self.token = token
-    def is_connected(self):
-        return self.connected
-    def is_special(self):
-        return self.special

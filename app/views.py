@@ -2,12 +2,9 @@ from flask import (Blueprint, render_template, request, redirect, url_for,
                    session, flash)
 from flask.ext.login import (LoginManager, login_user, login_required,
                             current_user, logout_user)
-from app.models import *
-from app.forms import *
-from app.settings import PUBLISHABLE_KEY, SECRETIVE_KEY, CLIENT_ID
-import stripe
-import urllib
-import requests
+from app.models import User
+from app.forms import LoginForm, RegistrationForm, SettingsForm
+import urllib, stripe, requests, os, json
 
 login_manager = LoginManager()
 
@@ -17,8 +14,7 @@ views = Blueprint('views', __name__, static_folder='../static',
 @views.route('/')
 @login_required
 def index():
-    specials = User.objects(special=True)
-    return render_template('index.html',specials=specials,session=session)
+    return render_template('index.html',session=session)
 
 @views.route('/authorize/')
 @login_required
@@ -79,17 +75,11 @@ def charge():
         current_user.save()
     # later retrieve id and charge each donation          
     customer_id = current_user.stripe_customer_id
-    recipients = User.objects(special=True)
-    for recipient in recipients:
-        chargetoken = stripe.Token.create(
-            customer=customer_id,
-            api_key=recipient.token # recipient's Stripe auth token
-        )
-        stripe.Charge.create(
-            amount=recipient.amount,                       
+    stripe.Charge.create(
+            amount='',                       
             currency="usd",
-            card=chargetoken['id'],
-            description=current_user.username + " to " + recipient.name
+            card='',
+            description=current_user.username +  "for x dollars"
         )
     return render_template('charge.html')
 
@@ -106,7 +96,8 @@ def register():
             user.authenticated = True
             user.save()
             login_user(user)
-            return redirect(request.args.get("next") or url_for('views.index'))
+            flash("You successfully registered.")
+            return redirect(url_for('views.index'))
         else:
             flash("That username is already taken.")
     return render_template('register.html', form=form, session=session)
@@ -117,41 +108,37 @@ def login():
     if request.method == 'POST' and form.validate():
         user = User.objects.filter(username=form.username.data).first()
         if user:
-            good_password= user.check_password(form.password.data)
+            good_password = user.check_password(form.password.data)
             if good_password:
                 user.authenticated = True
                 user.save()
                 remember = request.form.get("remember", "n") == "y"
                 if login_user(user, remember=remember):
-                    return redirect(request.args.get("next") or url_for('views.index'))
+                    flash("You logged in successfully.")
+                    return redirect(url_for('views.index'))
                 else:
                     flash("Your account is marked as inactive.")
-                    return redirect(url_for('views.login'))
             else:
-                flash("There was an error logging in.")
+                flash("There was an error logging in, password incorrect.")
         else:
-            flash("There was an error logging in.")
-        redirect(url_for('views.login'))
+            flash("There was an error logging in, user not found.")
     return render_template('login.html', form=form, session=session)
 
 @views.route('/settings/', methods=['GET', 'POST'])
 @login_required
 def settings():
     form = None
-    special = current_user.is_special
-    connected = current_user.is_connected
     if current_user.service == 'local':
-        form = SettingsForm(request.form, email=current_user.email, name=current_user.name, special_name=current_user.special_name, special_info=current_user.special_info, special_website=current_user.special_website)
+        form = SettingsForm(request.form, current_user)
     if request.method == 'POST' and form.validate():
         current_user.email = form.email.data
         current_user.name = form.name.data
-        current_user.special_name = form.special_name.data
-        current_user.special_info = form.special_info.data
-        current_user.special_website = form.special_website.data
         if form.password.data != None:
             current_user.set_password(form.password.data)
+            flash("You updated your password.")
         current_user.save()
-    return render_template('settings.html', form=form, special=special, connected=connected)
+        flash("You updated your settings.")
+    return render_template('settings.html', form=form)
 
 @views.route('/logout/', methods=['GET', 'POST'])
 @login_required
@@ -159,43 +146,14 @@ def logout():
     current_user.authenticated = False
     current_user.save()
     logout_user()
-    return redirect(url_for('views.index'))
-
-@views.route('/admin/', methods=['GET', 'POST'])
-@login_required
-def admin():
-    if current_user.username == 'admin':
-        users = User.objects
-        class F(SelectionForm):
-            pass
-        class specials:
-            pass
-        for user in users:
-            username = user.username
-            setattr(F, username, BooleanField(username))
-            setattr(specials, username, user.special)
-        form = F(request.form, specials)
-        if request.method == 'POST' and form.validate():
-            for user in users:
-                if user.username in request.form:
-                    user.special = True
-                else:
-                    user.special = False
-                user.save()
-                setattr(specials, user.username, user.special)
-            form = F(request.form, specials)
-        return render_template('admin.html', form=form)
-    else:
-        flash("You are not an authorized administrator")
-        return redirect(url_for('views.index'))
+    flash("You logged out successfully.")
+    return redirect(url_for('views.login'))
 
 @views.app_errorhandler(404)
 def page_not_found(error):
-    """Custom 404 page."""
     return render_template('404.html', session=session), 404
 
 @views.app_errorhandler(500)
 def page_not_found(error):
     """Custom 500 page."""
-    # Insert error logging here.
     return render_template('500.html', session=session), 500

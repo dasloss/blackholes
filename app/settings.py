@@ -5,6 +5,8 @@ Global settings for your application.
 # Environment                                                                  
 environment = 'local'
 type_of_stripe = 'testing'
+if environment == 'testing':
+    type_of_stripe = 'testing'
 
 # Database settings                                                            
 if environment == 'cloud':
@@ -19,6 +21,12 @@ elif environment == 'local':
     DB_PORT = 27017
     DB_USER = ''                                                         
     DB_PASS = ''                                                      
+elif environment == 'testing':
+    DB = 'testblackholes'
+    DB_HOST = 'localhost'
+    DB_PORT = 27017
+    DB_USER = ''
+    DB_PASS = ''
 MONGO_URI=''
 
 # Stripe settings
