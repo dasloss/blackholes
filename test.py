@@ -1,6 +1,5 @@
 import unittest, flask
 from app import app, User, views, login_manager
-from stripe import stripe
 
 class AppTestCase(unittest.TestCase):
     

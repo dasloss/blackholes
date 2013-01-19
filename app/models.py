@@ -1,6 +1,5 @@
 from mongoengine import *
 from hashlib import sha256
-import settings
 
 class User(Document):
     username = StringField(required=True)
@@ -9,7 +8,6 @@ class User(Document):
     password = BinaryField(required=False)
     active = BooleanField(default=True)
     service = StringField()
-    stripe_customer_id = StringField(required=False)
     authenticated = BooleanField(default=False)
     def is_authenticated(self):
         return self.authenticated
@@ -23,6 +21,6 @@ class User(Document):
         return False
     def get_id(self):
         return self.username
-    def set_stripe_customer_id(self, stripe_customer_id):
-        self.stripe_customer_id = stripe_customer_id
+    # google connection
+    google_cal_id = StringField(required=False)
     meta = {'allow_inheritance': True}

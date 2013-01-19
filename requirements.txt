@@ -1,7 +1,6 @@
 flask
 flask-wtf
 flask-login
-mock
 mongoengine
 gunicorn
-stripe
+google-api-python-client

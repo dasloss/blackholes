@@ -16,72 +16,10 @@ views = Blueprint('views', __name__, static_folder='../static',
 def index():
     return render_template('index.html',session=session)
 
-@views.route('/authorize/')
-@login_required
-def authorize():
-  site   = 'https://connect.stripe.com/oauth/authorize'
-  params = {'response_type': 'code',
-            'scope': 'read_write',
-            'client_id': CLIENT_ID
-           }
-  # Redirect to Stripe /oauth/authorize endpoint
-  url = site + '?' + urllib.urlencode(params)
-  return redirect(url)
- 
-@views.route('/oauth/callback/')
-@login_required
-def callback():
-  code   = request.args.get('code')
-  header = {'Authorization': 'Bearer %s' % SECRETIVE_KEY}
-  data   = {'grant_type': 'authorization_code',
-            'client_id': CLIENT_ID,
-            'code': code
-           }
-  # Make /oauth/token endpoint POST request
-  url ='https://connect.stripe.com/oauth/token'
-  resp = requests.post(url, params=data, headers=header)
-  # Grab access_token (use this as your user's API key)
-  jsontoken = resp.json()#.get('access_token')
-  token = jsontoken['access_token']
-  current_user.set_token(token)
-  current_user.connected = True
-  current_user.save()
-  return redirect(url_for('views.settings'))
-
 @views.route('/about/')
 def about():
     """Render about."""
     return render_template('about.html', session=session)
-
-@views.route('/pay/', methods=['GET', 'POST'])
-@login_required
-def pay():
-    return render_template('pay.html', pubkey=PUBLISHABLE_KEY)
-
-@views.route('/charge/', methods=['GET', 'POST'])
-@login_required
-def charge():
-    # set secret key, get the credit card details submitted by the form   
-    stripe.api_key = SECRETIVE_KEY
-    token = request.form['stripeToken']
-    if current_user.stripe_customer_id == None:
-        # create a Customer                                             
-        customer = stripe.Customer.create(
-            card=token,
-            description=current_user.username
-        )
-        # save the customer ID in your database so you can use it later  
-        current_user.set_stripe_customer_id(customer.id)
-        current_user.save()
-    # later retrieve id and charge each donation          
-    customer_id = current_user.stripe_customer_id
-    stripe.Charge.create(
-            amount='',                       
-            currency="usd",
-            card='',
-            description=current_user.username +  "for x dollars"
-        )
-    return render_template('charge.html')
 
 @views.route('/register/', methods=['GET', 'POST'])
 def register():
@@ -148,6 +86,38 @@ def logout():
     logout_user()
     flash("You logged out successfully.")
     return redirect(url_for('views.login'))
+
+@views.route('/authorize/gcal/')
+@login_required
+def gcalauth():
+  site   = 'https://connect.stripe.com/oauth/authorize'
+  params = {'response_type': 'code',
+            'scope': 'read_write',
+            'client_id': CLIENT_ID
+           }
+  # Redirect to Stripe /oauth/authorize endpoint                               
+  url = site + '?' + urllib.urlencode(params)
+  return redirect(url)
+
+@views.route('/callback/gcal/')
+@login_required
+def gcalcallback():
+  code   = request.args.get('code')
+  header = {'Authorization': 'Bearer %s' % SECRETIVE_KEY}
+  data   = {'grant_type': 'authorization_code',
+            'client_id': CLIENT_ID,
+            'code': code
+           }
+  # Make /oauth/token endpoint POST request                                    
+  url ='https://connect.stripe.com/oauth/token'
+  resp = requests.post(url, params=data, headers=header)
+  # Grab access_token (use this as your user's API key)                        
+  jsontoken = resp.json()#.get('access_token')                                
+  token = jsontoken['access_token']
+  current_user.set_token(token)
+  current_user.connected = True
+  current_user.save()
+  return redirect(url_for('views.settings'))
 
 @views.app_errorhandler(404)
 def page_not_found(error):
