@@ -23,3 +23,14 @@ class User(Document):
     def get_id(self):
         return self.username
     meta = {'allow_inheritance': True}
+
+class Event(Document):
+        name = StringField(required = True)
+        startTime = DateTimeField(requried = True)
+        endTime = DateTimeField(required = True)
+        intervalMinutes = IntField()
+        priority = IntField(default = 0)
+        type = StringField()
+        def get_name(self):
+                return self.name
+        meta = {'allow_inheritance': True}
