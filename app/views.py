@@ -4,8 +4,11 @@ from flask.ext.login import (LoginManager, login_user, login_required,
                             current_user, logout_user)
 from app.models import User
 from app.forms import LoginForm, RegistrationForm, SettingsForm
-import os, json
+from settings import CLIENT_ID, CLIENT_SECRET, DEVELOPER_KEY
 from oauth2client.client import OAuth2WebServerFlow 
+from oauth2client.file import Storage
+from apiclient.discovery import build
+import httplib2
 
 login_manager = LoginManager()
 
@@ -15,11 +18,30 @@ views = Blueprint('views', __name__, static_folder='../static',
 flow = OAuth2WebServerFlow(client_id=CLIENT_ID,
                   client_secret=CLIENT_SECRET,
                   scope='https://www.googleapis.com/auth/calendar',
-                  redirect_uri='https://localhost:5000/oauth/callback')
+                  redirect_uri='http://localhost:5000/oauth/callback')
 
 @views.route('/')
 @login_required
 def index():
+    if current_user.connected:
+        storage = Storage('credentials/'+current_user.username)
+        credentials = storage.get()
+        http = httplib2.Http()
+        http = credentials.authorize(http)
+        service = build(serviceName='calendar', version='v3', http=http,
+                        developerKey=DEVELOPER_KEY)
+        try:
+            request = service.events().list(calendarId='primary')
+            while request != None:
+                response = request.execute()
+                for event in response.get('items', []):
+                    print repr(event.get('summary', 'NO SUMMARY')) + '\n'
+                request = service.events().list_next(request, response)
+        except AccessTokenRefreshError:
+            print ('The credentials have been revoked or expired, please re-runthe application to re-authorize')
+    else:
+        flash("Please connect a google calendar.")
+        redirect(url_for('views.settings'))
     return render_template('index.html',session=session)
 
 @views.route('/about/')
@@ -102,11 +124,11 @@ def authorize():
 @views.route('/oauth/callback/')
 @login_required
 def callback():
-    code   = request.args.get('code')
+    code = request.args.get('code')
     if code:
         credentials = flow.step2_exchange(code)
-        
-        current_user.set_token(token)
+        storage = Storage('credentials/'+current_user.username)
+        storage.put(credentials)
         current_user.connected = True
         current_user.save()
         flash("You connected to Google Calendar.")

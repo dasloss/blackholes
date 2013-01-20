@@ -13,9 +13,9 @@
     <div class="actions"><input type="submit" value="Save settings" class="btn primary" /></div>
 </form>
 {% if connected == True %}
-<p>You are logged in to Stripe</p>
+<p>You are connected to Google Calendars</p>
 {% else %}
-<p><a href="/authorize/"><img src="/static/blue.png" alt="Connect to Stripe" title="Connect to Stripe"></a></p>
+<p><a href="/authorize/">Connect your Google Calendar</a></p>
 {% endif %}
 {% else %}
 <p>Your account is linked to {{ current_user.service.title() }}. All settings

@@ -9,6 +9,7 @@ class User(Document):
     active = BooleanField(default=True)
     service = StringField()
     authenticated = BooleanField(default=False)
+    connected = BooleanField(default=False)
     def is_authenticated(self):
         return self.authenticated
     def set_password(self, password):
@@ -21,6 +22,4 @@ class User(Document):
         return False
     def get_id(self):
         return self.username
-    # google connection
-    google_cal_id = StringField(required=False)
     meta = {'allow_inheritance': True}

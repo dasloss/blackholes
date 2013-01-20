@@ -29,6 +29,7 @@ MONGO_URI=''
 # Google settings
 CLIENT_ID = "1050823384007.apps.googleusercontent.com"
 CLIENT_SECRET = "MMdsIzvHXvBFXDZ2FDLk82lJ"
+DEVELOPER_KEY = "AIzaSyCZgLncQ1_Gn6R3ZholI2_01Ov0VTSU5bQ"
 
 # App settings                                                                 
 SECRET_KEY = ''
