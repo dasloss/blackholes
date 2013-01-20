@@ -1,4 +1,4 @@
-from wtforms import Form, TextField, PasswordField, BooleanField, validators, ValidationError, TextAreaField, FileField, IntegerField
+from wtforms import Form, TextField, PasswordField, BooleanField, validators, IntegerField
 
 class LoginForm(Form):
     username = TextField('User Name', [validators.Required()])
@@ -25,3 +25,11 @@ class SettingsForm(Form):
         validators.EqualTo('confirm', message='New passwords must match')
         ])
     confirm = PasswordField('Repeat password', [validators.Required()])
+
+class EventForm(Form):
+    name = TextField('Event Name', [validators.Required()])
+    intervalMinutes = IntegerField('Length of Time', [validators.Required()])
+    priority = IntegerField('Priority', [validators.Required(),
+                           validators.NumberRange(min=0, max=5, message=
+                            "Priority must be between 0 and 5")])
+    type = TextField('Type', [validators.Optional()])

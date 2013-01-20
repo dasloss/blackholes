@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Add Event{% endblock %}
+
+{% block main %}
+<h1>Add Event</h1>
+{% from "_formhelpers.html" import render_field %}
+<form id="addevent" method="post" action="">
+  {% for field in form %}
+    {{ render_field(field) }}
+  {% endfor %}
+    <div class="actions"><input type="submit" value="Add Event" class="btn primary" /></div>
+</form>
+{% endblock %}

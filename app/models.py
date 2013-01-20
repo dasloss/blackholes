@@ -26,8 +26,8 @@ class User(Document):
 
 class Event(Document):
     name = StringField(required = True)
-    startTime = DateTimeField(required = True)
-    endTime = DateTimeField(required = True)
-    intervalMinutes = IntField()
+    startTime = DateTimeField(required = False)
+    endTime = DateTimeField(required = False)
+    intervalMinutes = IntField(required = True)
     priority = IntField(default = 0)
-    type = StringField()
+    type = StringField(required = False)
